@@ -14,6 +14,17 @@ import {
 } from '@lit-labs/analyzer/lib/model.js';
 import {javascript, FileTree} from '@lit-labs/gen-utils/lib/file-utils.js';
 
+export const getCommand = () => {
+  return {
+    name: 'react',
+    description: 'Generate React wrapper components from Lit elements',
+    kind: 'resolved',
+    async generate(options: {analysis: Package}): Promise<FileTree> {
+      return generateReactWrapper(options.analysis);
+    },
+  };
+};
+
 export const generateReactWrapper = async (
   analysis: Package
 ): Promise<FileTree> => {
@@ -175,6 +186,6 @@ export const ${name} = createComponent(
       }',`
     )}
   }
-);    
+);
 `;
 };
