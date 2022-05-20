@@ -17,7 +17,7 @@ import {
   packPackage,
 } from '@lit-labs/gen-utils/lib/package-utils.js';
 import {writeFileTree} from '@lit-labs/gen-utils/lib/file-utils.js';
-import {generateReactWrapper} from '../index.js';
+import {getCommand} from '../index.js';
 import {assertGoldensMatch} from 'tests/utils/assert-goldens.js';
 
 const testProjects = '../test-projects';
@@ -34,7 +34,8 @@ test('basic wrapper generation', async () => {
 
   const analyzer = new Analyzer(inputPackage as AbsolutePath);
   const analysis = analyzer.analyzePackage();
-  await writeFileTree(outputFolder, await generateReactWrapper(analysis));
+  const command = getCommand();
+  await writeFileTree(outputFolder, await command.generate({analysis}));
 
   const wrapperSourceFile = fs.readFileSync(
     path.join(outputPackage, 'src/element-a.ts')

@@ -20,32 +20,30 @@ export const getCommand = () => {
     description: 'Generate React wrapper components from Lit elements',
     kind: 'resolved',
     async generate(options: {analysis: Package}): Promise<FileTree> {
-      return generateReactWrapper(options.analysis);
+      const analysis = options.analysis;
+      const litModules: LitModule[] = getLitModules(analysis);
+      if (litModules.length > 0) {
+        // Base the generated package folder name off the analyzed package folder
+        // name, not the npm package name, since that might have an npm org in it
+        const reactPkgFolder = packageNameToReactPackageName(
+          path.basename(analysis.rootDir)
+        );
+        return {
+          [reactPkgFolder]: {
+            '.gitignore': gitIgnoreTemplate(litModules),
+            'package.json': packageJsonTemplate(
+              analysis.packageJson,
+              litModules
+            ),
+            'tsconfig.json': tsconfigTemplate(),
+            ...wrapperFiles(analysis.packageJson, litModules),
+          },
+        };
+      } else {
+        throw new Error('No Lit components were found in this package.');
+      }
     },
   };
-};
-
-export const generateReactWrapper = async (
-  analysis: Package
-): Promise<FileTree> => {
-  const litModules: LitModule[] = getLitModules(analysis);
-  if (litModules.length > 0) {
-    // Base the generated package folder name off the analyzed package folder
-    // name, not the npm package name, since that might have an npm org in it
-    const reactPkgFolder = packageNameToReactPackageName(
-      path.basename(analysis.rootDir)
-    );
-    return {
-      [reactPkgFolder]: {
-        '.gitignore': gitIgnoreTemplate(litModules),
-        'package.json': packageJsonTemplate(analysis.packageJson, litModules),
-        'tsconfig.json': tsconfigTemplate(),
-        ...wrapperFiles(analysis.packageJson, litModules),
-      },
-    };
-  } else {
-    throw new Error('No Lit components were found in this package.');
-  }
 };
 
 const wrapperFiles = (packageJson: PackageJson, litModules: LitModule[]) => {
