@@ -1,5 +1,5 @@
 {
-  "name": "internal-scripts",
+  "name": "@lit-internal/scripts",
   "private": true,
   "version": "1.0.0",
   "description": "Internal scripts for the Lit monorepo",
