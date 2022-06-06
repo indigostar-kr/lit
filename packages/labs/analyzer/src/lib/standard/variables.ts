@@ -11,17 +11,19 @@
  */
 
 import ts from 'typescript';
-import {VariableDeclaration} from '../model.js';
+import {MixinDeclaration, VariableDeclaration} from '../model.js';
 import {ProgramContext} from '../program-context.js';
+import {maybeGetMixinDeclaration} from './mixins.js';
 
 export const getVariableDeclarations = (
   statement: ts.VariableStatement,
   programContext: ProgramContext
-): VariableDeclaration[] => {
+): (VariableDeclaration | MixinDeclaration)[] => {
   return statement.declarationList.declarations
     .filter((dec) => ts.isIdentifier(dec.name))
     .map(
       (dec) =>
+        maybeGetMixinDeclaration(dec, programContext) ??
         new VariableDeclaration({
           name: (dec.name as ts.Identifier).text,
           node: dec,
